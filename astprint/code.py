@@ -194,12 +194,12 @@ sourcecode. For more details have a look at the docstring of the
         self.body(node.body)
 
     def visit_ClassDef(self, node):
-        have_args = []
+        have_args = [False]
         def paren_or_comma():
-            if have_args:
+            if have_args[0]:
                 self.write(', ')
             else:
-                have_args.append(True)
+                have_args[0] = True
                 self.write('(')
 
         self.decorators(node)
@@ -221,7 +221,7 @@ sourcecode. For more details have a look at the docstring of the
                 paren_or_comma()
                 self.write('**')
                 self.visit(node.kwargs)
-        self.write(have_args and '):' or ':')
+        self.write('):' if have_args[0] else ':')
         self.body(node.body)
 
     def visit_If(self, node):
@@ -302,12 +302,12 @@ sourcecode. For more details have a look at the docstring of the
         self.write('.' + node.attr)
 
     def visit_Call(self, node):
-        want_comma = []
+        want_comma = [False]
         def write_comma():
-            if want_comma:
+            if want_comma[0]:
                 self.write(', ')
             else:
-                want_comma.append(True)
+                want_comma[0] = True
 
         self.visit(node.func)
         self.write('(')
