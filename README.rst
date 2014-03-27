@@ -65,5 +65,3 @@ When ``ast.parse()``'ed, gives back the ``node``.
     >>> node = ast.parse(code)
     >>> as_code(node)
     ...
-
-
