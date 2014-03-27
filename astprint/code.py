@@ -152,7 +152,7 @@ sourcecode. For more details have a look at the docstring of the
         self.newline(node)
         for idx, target in enumerate(node.targets):
             if idx:
-                self.write(', ')
+                self.write(' = ')
             self.visit(target)
         self.write(' = ')
         self.visit(node.value)
