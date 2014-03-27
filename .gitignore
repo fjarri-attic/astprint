@@ -1,0 +1,6 @@
+__pycache__
+*.pyc
+*.sublime-workspace
+htmlcov
+*.egg-info
+
