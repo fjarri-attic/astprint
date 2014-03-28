@@ -3,4 +3,5 @@ __pycache__
 *.sublime-workspace
 htmlcov
 *.egg-info
+dist
 
