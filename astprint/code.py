@@ -452,6 +452,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
             self.visit(node.value)
 
     def visit_YieldFrom(self, node):
+        # Py>=3.3 syntax
         self.write('yield from ')
         self.visit(node.value)
 
@@ -462,6 +463,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
         self.visit(node.body)
 
     def visit_Ellipsis(self, _):
+        # Py>=3.0 syntax
         self.write('...')
 
     def generator_visit(left, right):
@@ -495,6 +497,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
         self.visit(node.orelse)
 
     def visit_Starred(self, node):
+        # Py>=3 syntax
         self.write('*')
         self.visit(node.value)
 
@@ -514,9 +517,11 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
                 self.visit(if_)
 
     def visit_arg(self, node):
+        # Py>=3 syntax
         self.write(node.arg)
 
     def visit_Print(self, node):
+        # Py2 syntax
         self.newline(node)
         self.write('print ')
         want_comma = False
@@ -533,6 +538,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
             self.write(',')
 
     def visit_TryExcept(self, node):
+        # Py2 syntax
         self.newline(node)
         self.write('try:')
         self.body(node.body)
@@ -540,6 +546,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
             self.visit(handler)
 
     def visit_TryFinally(self, node):
+        # Py2 syntax
         self.newline(node)
         self.write('try:')
         self.body(node.body)
@@ -548,6 +555,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
         self.body(node.finalbody)
 
     def visit_Try(self, node):
+        # Py>=3 syntax
         self.newline(node)
         self.write('try:')
         self.body(node.body)
@@ -570,7 +578,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
                     # In Py2, it's an ast.Name instance
                     self.visit(node.name)
                 else:
-                    # In Py3, it's just a string
+                    # In Py>=3, it's just a string
                     self.write(node.name)
         self.write(':')
         self.body(node.body)
@@ -579,7 +587,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
         self.newline(node)
         self.write('raise')
         if hasattr(node, 'exc') and node.exc is not None:
-            # Py3 syntax
+            # Py>=3 syntax
             self.write(' ')
             self.visit(node.exc)
             if node.cause is not None:
@@ -600,7 +608,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
         self.newline(node)
         self.write('with ')
         if hasattr(node, 'items'):
-            # Py3 syntax
+            # Py>=3 syntax
             for with_item in node.items:
                 self.visit(with_item.context_expr)
                 if with_item.optional_vars is not None:
@@ -618,6 +626,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
         self.body(node.body)
 
     def visit_Repr(self, node):
+        # Py2 syntax
         self.write('`')
         self.visit(node.value)
         self.write('`')
