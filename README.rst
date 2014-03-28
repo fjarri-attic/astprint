@@ -4,8 +4,11 @@ AST printing
 Build status
 ------------
 
-.. image:: https://travis-ci.org/Manticore/astprint.svg?branch=master
+.. image:: https://travis-ci.org/Manticore/astprint.png?branch=master
     :target: https://travis-ci.org/Manticore/astprint
+
+.. image:: https://coveralls.io/repos/Manticore/astprint/badge.png?branch=master
+    :target: https://coveralls.io/r/Manticore/astprint
 
 Rationale
 ---------
