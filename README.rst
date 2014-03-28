@@ -66,8 +66,17 @@ When ``ast.parse()``'ed, gives back the ``node``.
     >>> import ast
     >>> from astprint import as_code
     >>> code = """
-    ...
+    ... def func(x):
+    ...     if x > 0:
+    ...         return x
+    ...     else:
+    ...         return -x
     ... """
     >>> node = ast.parse(code)
-    >>> as_code(node)
-    ...
+    >>> print(as_code(node))
+
+    def func(x):
+        if x > 0:
+            return x
+        else:
+            return (-x)
