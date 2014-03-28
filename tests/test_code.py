@@ -190,7 +190,7 @@ def test_yield():
 
 
 def test_yield_from():
-    skip_if_before(3, 0)
+    skip_if_before(3, 3)
     check_transformation(
         """
         def gen2(x):
