@@ -546,8 +546,10 @@ sourcecode. For more details have a look at the docstring of the
             if node.name is not None:
                 self.write(' as ')
                 if isinstance(node.name, ast.AST):
+                    # In Py2, it's an ast.Name instance
                     self.visit(node.name)
                 else:
+                    # In Py3, it's just a string
                     self.write(node.name)
         self.write(':')
         self.body(node.body)
@@ -556,12 +558,14 @@ sourcecode. For more details have a look at the docstring of the
         self.newline(node)
         self.write('raise')
         if hasattr(node, 'exc') and node.exc is not None:
+            # Py3 syntax
             self.write(' ')
             self.visit(node.exc)
             if node.cause is not None:
                 self.write(' from ')
                 self.visit(node.cause)
         elif hasattr(node, 'type') and node.type is not None:
+            # Py2 syntax
             self.write(' ')
             self.visit(node.type)
             if node.inst is not None:
@@ -575,6 +579,7 @@ sourcecode. For more details have a look at the docstring of the
         self.newline(node)
         self.write('with ')
         if hasattr(node, 'items'):
+            # Py3 syntax
             for with_item in node.items:
                 self.visit(with_item.context_expr)
                 if with_item.optional_vars is not None:
@@ -583,6 +588,7 @@ sourcecode. For more details have a look at the docstring of the
                 if with_item != node.items[-1]:
                     self.write(', ')
         elif hasattr(node, 'context_expr'):
+            # Py2 syntax
             self.visit(node.context_expr)
             if node.optional_vars is not None:
                 self.write(' as ')
