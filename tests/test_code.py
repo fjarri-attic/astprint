@@ -48,6 +48,11 @@ def skip_if_py2():
         pytest.skip()
 
 
+def skip_if_not_py2():
+    if sys.version_info >= (3, 0, 0):
+        pytest.skip()
+
+
 def test_str():
     if sys.version_info < (3, 0, 0):
         src = """
@@ -65,9 +70,53 @@ def test_str():
 def test_dict():
     check_transformation(
         """
+        a = {}
         a = {'g': 'd'}
         a = {1: True, e: False}
         """)
+
+
+def test_set():
+    check_transformation(
+        """
+        a = {'g'}
+        a = {1, True}
+        """)
+
+
+def test_list():
+    check_transformation(
+        """
+        a = []
+        a = [1]
+        a = ['a', None]
+        """)
+
+
+def test_dict_comprehension():
+    check_transformation(
+        """
+        a = {x:x+1 for x in range(10)}
+        a = {x:'a' for x in range(10) if x > 5}
+        """)
+
+
+def test_set_comprehension():
+    check_transformation(
+        """
+        a = {x for x in range(10)}
+        a = {x for x in range(10) if x > 5}
+        """)
+
+
+def test_list_comprehension():
+    check_transformation(
+        """
+        a = [x for x in range(10)]
+        a = [x for x in range(10) if x > 5]
+        a = (x for x in range(10) if x > 5)
+        """)
+
 
 
 def test_tuple_assign():
@@ -75,6 +124,15 @@ def test_tuple_assign():
         """
         (a, b) = (1, 2)
         """)
+
+
+def test_starred_assign():
+    skip_if_py2()
+    check_transformation(
+        """
+        a, *b = it
+        """)
+
 
 def test_multi_assign():
     check_transformation(
@@ -88,6 +146,64 @@ def test_augmented_assign():
         a += 2
         """)
 
+
+def test_unary_op():
+    check_transformation(
+        """
+        a = -b
+        b = not a
+        """)
+
+
+def test_slice():
+    check_transformation(
+        """
+        a = l[:]
+        a = l[1:]
+        a = l[:1]
+        a = l[1:3]
+        a = l[::2]
+        a = l[1:10:2]
+        a = l[1:4,:5]
+        """)
+
+
+def test_yield():
+    check_transformation(
+        """
+        def gen(x):
+            for i in range(x):
+                yield i
+        """)
+
+
+def test_yield_from():
+    skip_if_py2()
+    check_transformation(
+        """
+        def gen2(x):
+            for i in range(x):
+                yield from gen(i)
+        """)
+
+
+def test_lambda():
+    check_transformation(
+        """
+        func = lambda x: x + 1
+        func = lambda x, *args, **kwds: x + 1
+        func = lambda x, a=4: x + a
+        """)
+
+
+def test_ellipsis():
+    skip_if_py2()
+    check_transformation(
+        """
+        a = l[1:5,2:6,...,:10]
+        """)
+
+
 def test_del():
     check_transformation(
         """
@@ -95,13 +211,18 @@ def test_del():
         del x, r
         """)
 
+
 def test_import():
     check_transformation(
         """
+        from .mod import a as b
+        from ..mod import a as b
         from math import pi as PI
         from math import sqrt
         import math
+        import a as b
         """)
+
 
 def test_function_simple():
     check_transformation(
@@ -109,6 +230,7 @@ def test_function_simple():
         def func(x, a=1):
             return x + a
         """)
+
 
 def test_function_decorator():
     check_transformation(
@@ -118,6 +240,7 @@ def test_function_decorator():
         def func(x, a=1):
             return x + a
         """)
+
 
 def test_function_varargs():
     check_transformation(
@@ -173,6 +296,7 @@ def test_for():
             continue
         """)
 
+
 def test_while():
     check_transformation(
         """
@@ -181,6 +305,7 @@ def test_while():
             break
             continue
         """)
+
 
 def test_if_else():
     check_transformation(
@@ -201,6 +326,7 @@ def test_if_else():
             blah()
         """)
 
+
 def test_body_else():
     check_transformation(
         """
@@ -210,11 +336,96 @@ def test_body_else():
             do_stuff()
         """)
 
+
 def test_ternary_if_else():
     check_transformation(
         """
         a = do_this() if e + 5 else do_that()
         """)
+
+
+def test_try():
+    check_transformation(
+        """
+        try:
+            do_stuff()
+        except:
+            raise
+
+        try:
+            do_stuff()
+        except Exception:
+            boo()
+        except OtherException as a:
+            hoo()
+        except:
+            raise
+
+        try:
+            do_stuff()
+        finally:
+            clean_up()
+
+        try:
+            do_stuff()
+        except Exception:
+            boo()
+        except OtherException as a:
+            hoo()
+        finally:
+            clean_up()
+        """)
+
+
+def test_raise():
+    check_transformation(
+        """
+        try:
+            do()
+        except:
+            raise
+
+        raise Exception
+        raise Exception(1, 2)
+        """)
+
+
+def test_raise_py2():
+    skip_if_not_py2()
+    check_transformation(
+        """
+        raise Exception, value
+        raise Exception, value, traceback
+        """)
+
+
+def test_raise_from():
+    skip_if_py2()
+    check_transformation(
+        """
+        raise Exception() from OtherException()
+        """)
+
+
+def test_with():
+    check_transformation(
+        """
+        with open('stuff'):
+            do_something()
+        with open('stuff') as f:
+            do_something()
+        with open('stuff') as f, open('other_stuff') as f2:
+            do_something()
+        """)
+
+
+def test_assert():
+    check_transformation(
+        """
+        assert a == 1
+        assert a > 1, 'error message'
+        """)
+
 
 def test_class_def():
     check_transformation(
@@ -228,18 +439,6 @@ def test_class_def():
         """)
 
 
-def test_print():
-    if sys.version_info < (3, 0, 0):
-        src = """
-            print 1
-            """
-    else:
-        src = """
-            print(1)
-            """
-    check_transformation(src)
-
-
 def test_class_def_extended():
     skip_if_py2()
     check_transformation(
@@ -248,4 +447,23 @@ def test_class_def_extended():
             pass
         class A(*args, **kwds):
             pass
+        """)
+
+
+def test_print():
+    skip_if_not_py2()
+    check_transformation(
+        """
+        print 1
+        print a, b
+        print a, b,
+        print >> stderr, c, d
+        """)
+
+
+def test_repr():
+    skip_if_not_py2()
+    check_transformation(
+        """
+        a = `b`
         """)
