@@ -52,7 +52,7 @@ ALL_SYMBOLS.update(CMPOP_SYMBOLS)
 ALL_SYMBOLS.update(UNARYOP_SYMBOLS)
 
 
-def as_code(node, indent_with=' ' * 4):
+def as_code(node, indent="    "):
     """
     This function can convert a node tree back into python sourcecode.
     This is useful for debugging purposes, especially if you're dealing with
@@ -63,14 +63,13 @@ def as_code(node, indent_with=' ' * 4):
     more data than regular sourcecode does, which is dropped during
     conversion.
 
-    Each level of indentation is replaced with `indent_with`. Per default this
+    Each level of indentation is replaced with `indent`. Per default this
     parameter is equal to four spaces as suggested by PEP 8, but it might be
     adjusted to match the application's styleguide.
     """
-    generator = SourceGeneratorNodeVisitor(indent_with)
-    generator.visit(node)
-
-    return ''.join(generator.result)
+    visitor = SourceGeneratorNodeVisitor(indent)
+    visitor.visit(node)
+    return visitor.dumps()
 
 
 class SourceGeneratorNodeVisitor(ast.NodeVisitor):
@@ -80,11 +79,14 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
     `as_code` function.
     """
 
-    def __init__(self, indent_with):
+    def __init__(self, indent):
         self.result = []
-        self.indent_with = indent_with
+        self.indent_with = indent
         self.indentation = 0
         self.new_line = False
+
+    def dumps(self):
+        return "".join(self.result)
 
     def write(self, x, node=None):
         self.correct_line_number(node)

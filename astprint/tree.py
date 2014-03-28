@@ -1,68 +1,62 @@
-from __future__ import print_function
-
 import sys
 import ast
 
-if sys.version_info < (3,):
-    from StringIO import StringIO
-else:
-    from io import StringIO
+
+def as_tree(node, indent="  "):
+    """
+    Returns an eval-able string representing a node tree.
+
+    The result is the same as given by `ast.dump()`, except that the elements of the tree
+    are put on separate lines and indented with `indent`s
+    so that the whole tree is more human-readable.
+    """
+    visitor = ASTPrinter(indent)
+    visitor.visit(node)
+    return visitor.dumps()
 
 
 class ASTPrinter(ast.NodeVisitor):
 
     def __init__(self, indent):
-        self.out = StringIO()
-        self.current_indent = ''
-        self.one_indent = indent
+        self.result = []
+        self.indentation = 0
+        self.indent_with = indent
 
     def dumps(self):
-        self.out.seek(0)
-        return self.out.read()
+        return "".join(self.result)
 
-    def print(self, text, **kwargs):
-        new_text = text.format(**kwargs)
-        print(new_text, file=self.out, sep='', end='')
+    def write(self, text):
+        self.result.append(text)
 
     def generic_visit(self, node):
 
         if isinstance(node, list):
-            nodestart = '['
-            nodeend = ']'
+            nodestart = "["
+            nodeend = "]"
             children = [("", child) for child in node]
         else:
-            nodestart = type(node).__name__ + '('
-            nodeend = ')'
+            nodestart = type(node).__name__ + "("
+            nodeend = ")"
             children = sorted(
                 [(attr + "=", getattr(node, attr)) for attr in node._fields if hasattr(node, attr)])
 
         if len(children) > 1:
-            self.current_indent += self.one_indent
+            self.indentation += 1
 
-        self.print(nodestart)
+        self.write(nodestart)
         for i, pair in enumerate(children):
             attr, child = pair
             if len(children) > 1:
-                self.print("\n" + self.current_indent)
+                self.write("\n" + self.indent_with * self.indentation)
             if isinstance(child, (ast.AST, list)):
-                self.print(attr)
+                self.write(attr)
                 self.visit(child)
             else:
-                self.print("{attr}{value}", attr=attr, value=repr(child))
+                self.write(attr + repr(child))
 
             if i != len(children) - 1:
-                self.print(",")
-        self.print(nodeend)
+                self.write(",")
+        self.write(nodeend)
 
         if len(children) > 1:
-            self.current_indent = self.current_indent[:-len(self.one_indent)]
-
-
-def as_tree(node, indent='  '):
-    '''
-    Returns an eval-able string representing the AST.
-    '''
-
-    visitor = ASTPrinter(indent)
-    visitor.visit(node)
-    return visitor.dumps()
+            self.indentation -= 1
