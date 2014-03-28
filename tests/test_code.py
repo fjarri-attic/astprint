@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from astprint import as_code
+from astprint import as_code, as_tree
 
 
 def unshift(source):
@@ -33,14 +33,21 @@ def assert_ast_equal(test, expected):
 
 def check_transformation(source):
     source = unshift(source)
-    tree = ast.parse(source)
-    #print(ast.dump(tree))
-    new_source = as_code(tree)
-    new_tree = ast.parse(new_source)
+    node = ast.parse(source)
 
+    # Check as_code()
+
+    new_source = as_code(node)
+    new_node = ast.parse(new_source)
     # Comparing the ASTs to avoid differences in code formatting
     # popping up as errors.
-    assert_ast_equal(tree, new_tree)
+    assert_ast_equal(node, new_node)
+
+    # Check as_tree()
+
+    tree_dump = as_tree(node)
+    new_node = eval(tree_dump, ast.__dict__)
+    assert_ast_equal(node, new_node)
 
 
 def skip_if_after(major, minor):
