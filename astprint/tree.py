@@ -1,4 +1,3 @@
-import sys
 import ast
 
 
@@ -6,9 +5,9 @@ def as_tree(node, indent="  "):
     """
     Returns an eval-able string representing a node tree.
 
-    The result is the same as given by `ast.dump()`, except that the elements of the tree
-    are put on separate lines and indented with `indent`s
-    so that the whole tree is more human-readable.
+    The result is the same as given by `ast.dump()`,
+    except that the elements of the tree are put on separate lines
+    and indented with `indent`s so that the whole tree is more human-readable.
     """
     visitor = ASTPrinter(indent)
     visitor.visit(node)
@@ -38,7 +37,8 @@ class ASTPrinter(ast.NodeVisitor):
             nodestart = type(node).__name__ + "("
             nodeend = ")"
             children = sorted(
-                [(attr + "=", getattr(node, attr)) for attr in node._fields if hasattr(node, attr)])
+                [(attr + "=", getattr(node, attr)) for attr in node._fields
+                    if hasattr(node, attr)])
 
         if len(children) > 1:
             self.indentation += 1

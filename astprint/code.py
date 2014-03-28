@@ -1,6 +1,8 @@
 """
-Source generator node visitor from Python AST was originaly written by Armin Ronacher (2008), license BSD.
-Taken from https://github.com/konradhalas/astmonkey by Konrad Halas and Ruben Acuna
+Source generator node visitor from Python AST was originaly written
+by Armin Ronacher (2008), license BSD.
+Further modified by Konrad Halas and Ruben Acuna
+for https://github.com/konradhalas/astmonkey
 """
 
 import ast
@@ -88,9 +90,9 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
     def dumps(self):
         return "".join(self.result)
 
-    def write(self, x, node=None):
+    def write(self, text, node=None):
         self.correct_line_number(node)
-        self.result.append(x)
+        self.result.append(text)
 
     def correct_line_number(self, node):
         if self.new_line:
@@ -104,7 +106,8 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
             line_diff = node.lineno - lines
 
             if line_diff:
-                self.result.append(('\n' + (self.indent_with * self.indentation)) * line_diff)
+                self.result.append(
+                    ('\n' + (self.indent_with * self.indentation)) * line_diff)
 
     def newline(self, node=None):
         self.new_line = True
@@ -187,7 +190,8 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
                 name += ' as ' + alias.asname
             imports.append(name)
 
-        self.write('from {0}{1} import {2}'.format('.' * node.level, node.module or '', ', '.join(imports)))
+        self.write('from {0}{1} import {2}'.format(
+            '.' * node.level, node.module or '', ', '.join(imports)))
 
     def visit_Import(self, node):
         for item in node.names:
@@ -457,7 +461,7 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
         self.write(': ')
         self.visit(node.body)
 
-    def visit_Ellipsis(self, node):
+    def visit_Ellipsis(self, _):
         self.write('...')
 
     def generator_visit(left, right):
