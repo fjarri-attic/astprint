@@ -1,9 +1,6 @@
 AST printing
 ============
 
-Build status
-------------
-
 .. image:: https://travis-ci.org/Manticore/astprint.png?branch=master
     :target: https://travis-ci.org/Manticore/astprint
 
