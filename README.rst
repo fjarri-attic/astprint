@@ -31,40 +31,27 @@ For the ease of maintenance it aims to be highly specialized and contain only th
 Usage
 -----
 
-Printing a tree
-~~~~~~~~~~~~~~~
-
 ::
 
-    astprint.as_tree(node)
+    astprint.as_tree(node, indent='  ')
 
 Returns a string with the ``ast.AST`` node pretty printed as a tree.
 When ``eval()``'ed (with all the members of ``ast`` in the namespace), gives back the ``node``.
 
 ::
 
-    >>> import ast
-    >>> from astprint import as_tree
-    >>> node =
-    >>> ast.dump(node)
-    ...
-    >>> as_tree(node)
-    ...
-
-Printing code
-~~~~~~~~~~~~~
-
-::
-
-    astprint.as_code(node)
+    astprint.as_code(node, indent='    ')
 
 Returns a string with the ``ast.AST`` node pretty printed as a code snippet.
 When ``ast.parse()``'ed, gives back the ``node``.
 
+Example
+-------
+
 ::
 
     >>> import ast
-    >>> from astprint import as_code
+    >>> from astprint import as_code, as_tree
     >>> code = """
     ... def func(x):
     ...     if x > 0:
@@ -80,3 +67,34 @@ When ``ast.parse()``'ed, gives back the ``node``.
             return x
         else:
             return (-x)
+    >>> print(as_tree(node))
+    Module(body=[FunctionDef(
+      args=arguments(
+        args=[arg(
+          annotation=None,
+          arg='x')],
+        defaults=[],
+        kw_defaults=[],
+        kwarg=None,
+        kwargannotation=None,
+        kwonlyargs=[],
+        vararg=None,
+        varargannotation=None),
+      body=[If(
+        body=[Return(value=Name(
+          ctx=Load(),
+          id='x'))],
+        orelse=[Return(value=UnaryOp(
+          op=USub(),
+          operand=Name(
+            ctx=Load(),
+            id='x')))],
+        test=Compare(
+          comparators=[Num(n=0)],
+          left=Name(
+            ctx=Load(),
+            id='x'),
+          ops=[Gt()]))],
+      decorator_list=[],
+      name='func',
+      returns=None)])
