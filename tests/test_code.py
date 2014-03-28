@@ -43,28 +43,37 @@ def check_transformation(source):
     assert_ast_equal(tree, new_tree)
 
 
-def skip_if_py2():
-    if sys.version_info < (3, 0, 0):
+def skip_if_after(major, minor):
+    if sys.version_info >= (major, minor):
         pytest.skip()
 
 
-def skip_if_not_py2():
-    if sys.version_info >= (3, 0, 0):
+def skip_if_before(major, minor):
+    if sys.version_info < (major, minor):
         pytest.skip()
 
 
-def test_str():
-    if sys.version_info < (3, 0, 0):
-        src = """
-            a = 'abcd'
-            b = u'defg'
-            """
-    else:
-        src = """
-            a = 'abcd'
-            b = b'defg'
-            """
-    check_transformation(src)
+def test_str_default():
+    check_transformation(
+        """
+        a = 'abcd'
+        """)
+
+
+def test_str_unicode():
+    skip_if_after(3, 0)
+    check_transformation(
+        """
+        a = u'abcd'
+        """)
+
+
+def test_str_bytes():
+    skip_if_before(3, 0)
+    check_transformation(
+        """
+        a = b'abcd'
+        """)
 
 
 def test_dict():
@@ -77,6 +86,7 @@ def test_dict():
 
 
 def test_set():
+    skip_if_before(2, 7)
     check_transformation(
         """
         a = {'g'}
@@ -94,6 +104,7 @@ def test_list():
 
 
 def test_dict_comprehension():
+    skip_if_before(2, 7)
     check_transformation(
         """
         a = {x:x+1 for x in range(10)}
@@ -102,6 +113,7 @@ def test_dict_comprehension():
 
 
 def test_set_comprehension():
+    skip_if_before(2, 7)
     check_transformation(
         """
         a = {x for x in range(10)}
@@ -127,7 +139,7 @@ def test_tuple_assign():
 
 
 def test_starred_assign():
-    skip_if_py2()
+    skip_if_before(3, 0)
     check_transformation(
         """
         a, *b = it
@@ -178,7 +190,7 @@ def test_yield():
 
 
 def test_yield_from():
-    skip_if_py2()
+    skip_if_before(3, 0)
     check_transformation(
         """
         def gen2(x):
@@ -197,7 +209,7 @@ def test_lambda():
 
 
 def test_ellipsis():
-    skip_if_py2()
+    skip_if_before(3, 0)
     check_transformation(
         """
         a = l[1:5,2:6,...,:10]
@@ -260,7 +272,7 @@ def test_global():
 
 
 def test_nonlocal():
-    skip_if_py2()
+    skip_if_before(3, 0)
     check_transformation(
         """
         def func(x, y, *args, **kwds):
@@ -391,7 +403,7 @@ def test_raise():
 
 
 def test_raise_py2():
-    skip_if_not_py2()
+    skip_if_after(3, 0)
     check_transformation(
         """
         raise Exception, value
@@ -400,7 +412,7 @@ def test_raise_py2():
 
 
 def test_raise_from():
-    skip_if_py2()
+    skip_if_before(3, 0)
     check_transformation(
         """
         raise Exception() from OtherException()
@@ -414,6 +426,13 @@ def test_with():
             do_something()
         with open('stuff') as f:
             do_something()
+        """)
+
+
+def test_multiple_with():
+    skip_if_before(2, 7)
+    check_transformation(
+        """
         with open('stuff') as f, open('other_stuff') as f2:
             do_something()
         """)
@@ -440,7 +459,7 @@ def test_class_def():
 
 
 def test_class_def_extended():
-    skip_if_py2()
+    skip_if_before(3, 0)
     check_transformation(
         """
         class A(metaclass=D):
@@ -451,7 +470,7 @@ def test_class_def_extended():
 
 
 def test_print():
-    skip_if_not_py2()
+    skip_if_after(3, 0)
     check_transformation(
         """
         print 1
@@ -462,7 +481,7 @@ def test_print():
 
 
 def test_repr():
-    skip_if_not_py2()
+    skip_if_after(3, 0)
     check_transformation(
         """
         a = `b`
