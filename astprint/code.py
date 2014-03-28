@@ -139,10 +139,20 @@ class SourceGeneratorNodeVisitor(ast.NodeVisitor):
                 self.visit(default)
         if node.vararg is not None:
             write_comma()
-            self.write('*' + node.vararg)
+            if hasattr(ast, 'arg') and isinstance(node.vararg, ast.arg):
+                # Py3.4 and greater
+                self.write('*' + node.vararg.arg)
+            else:
+                # pre-Py3.4
+                self.write('*' + node.vararg)
         if node.kwarg is not None:
             write_comma()
-            self.write('**' + node.kwarg)
+            if hasattr(ast, 'arg') and isinstance(node.kwarg, ast.arg):
+                # Py3.4 and greater
+                self.write('**' + node.kwarg.arg)
+            else:
+                # pre-Py3.4
+                self.write('**' + node.kwarg)
 
     def decorators(self, node):
         for decorator in node.decorator_list:
