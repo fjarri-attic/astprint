@@ -83,12 +83,23 @@ def test_str_bytes():
         """)
 
 
+def test_name_constant():
+    # NameConstant class was introduced in Py3.4 to represent some common constants
+    # (Name for used before).
+    check_transformation(
+        """
+        a = True
+        b = False
+        c = None
+        """)
+
+
 def test_dict():
     check_transformation(
         """
         a = {}
         a = {'g': 'd'}
-        a = {1: True, e: False}
+        a = {1: 4.5, e: 1j+2}
         """)
 
 
