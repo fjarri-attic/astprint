@@ -11,6 +11,8 @@ install:
   - pip install pytest-cov
   - pip install .
 # command to run tests
-script: py.test --cov astprint
+script:
+  - coverage run --source=astprint setup.py test
+  - coverage report -m
 after_success:
   coveralls
