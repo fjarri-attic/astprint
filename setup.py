@@ -19,7 +19,7 @@ class PyTest(TestCommand):
 
 setup(
     name="astprint",
-    version="1.0.0+dev",
+    version="1.0.0",
     description="AST printers",
     long_description=open("README.rst").read(),
     url="https://github.com/Manticore/astprint",
