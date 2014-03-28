@@ -4,14 +4,14 @@ from setuptools import setup, find_packages
 
 setup(
     name="astprint",
-    version="1.0.0",
+    version="1.0.0+dev",
     description="AST printers",
     long_description=open("README.rst").read(),
     url="https://github.com/Manticore/astprint",
     author="Bogdan Opanchuk",
     author_email="bogdan@opanchuk.net",
     packages=find_packages(),
-    install_requires=["six"],
+    install_requires=[],
     tests_require=["pytest"],
     platforms=["any"],
     keywords="AST printing",
