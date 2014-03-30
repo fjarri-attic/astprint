@@ -71,7 +71,7 @@ def as_code(node, indent="    "):
     """
     visitor = SourceGeneratorNodeVisitor(indent)
     visitor.visit(node)
-    return visitor.dumps()
+    return visitor.dumps().strip("\n")
 
 
 class SourceGeneratorNodeVisitor(ast.NodeVisitor):

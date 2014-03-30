@@ -61,7 +61,6 @@ Example
     ... """
     >>> node = ast.parse(code)
     >>> print(as_code(node))
-
     def func(x):
         if x > 0:
             return x
