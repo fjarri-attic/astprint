@@ -37,8 +37,7 @@ class ASTPrinter(ast.NodeVisitor):
             nodestart = type(node).__name__ + "("
             nodeend = ")"
             children = sorted(
-                [(attr + "=", getattr(node, attr)) for attr in node._fields
-                    if hasattr(node, attr)])
+                [(name + "=", value) for name, value in ast.iter_fields(node)])
 
         if len(children) > 1:
             self.indentation += 1
